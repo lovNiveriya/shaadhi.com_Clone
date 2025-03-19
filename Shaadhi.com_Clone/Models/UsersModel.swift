@@ -11,8 +11,7 @@ struct UserResponse: Codable {
     let results: [User]
 }
 
-struct User: Codable, Identifiable {
-    let id = UUID()
+struct User: Codable {
     let name: Name
     let location: Location
     let email: String
@@ -44,3 +43,20 @@ struct User: Codable, Identifiable {
         let thumbnail: String
     }
 }
+
+extension User {
+    static let mockUser = User(
+        name: User.Name(title: "Mr", first: "John", last: "Doe"),
+        location: User.Location(city: "New York", state: "NY", country: "USA"),
+        email: "johndoe@example.com",
+        dob: User.DOB(date: "1990-01-01", age: 34),
+        picture: User.Picture(
+            large: "https://randomuser.me/api/portraits/men/1.jpg",
+            medium: "https://randomuser.me/api/portraits/med/men/1.jpg",
+            thumbnail: "https://randomuser.me/api/portraits/thumb/men/1.jpg"
+        ),
+        phone: "(123) 456-7890",
+        cell: "(987) 654-3210"
+    )
+}
+
