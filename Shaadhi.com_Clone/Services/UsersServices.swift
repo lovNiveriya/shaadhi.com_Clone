@@ -6,21 +6,22 @@
 //
 
 import Foundation
-import Combine
 
 protocol UserServiceProtocol {
-    func fetchUsers() -> AnyPublisher<[User], Error>
+    func fetchUsers() async throws -> [User]
 }
 
 final class UserServiceIMPL: UserServiceProtocol {
-    private let url = URL(string: "https://randomuser.me/api/?results=10")!
+    private let networkService: NetworkServiceProtocol
+    private let url: URL
 
-    func fetchUsers() -> AnyPublisher<[User], Error> {
-        return URLSession.shared.dataTaskPublisher(for: url)
-            .map { $0.data }
-            .decode(type: UserResponse.self, decoder: JSONDecoder())
-            .map { $0.results }
-            .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+    init(networkService: NetworkServiceProtocol = NetworkServiceIMPL(), url: URL) {
+        self.networkService = networkService
+        self.url = url
+    }
+
+    func fetchUsers() async throws -> [User] {
+        let response: UserResponse = try await networkService.fetchData(from: url)
+        return response.results
     }
 }

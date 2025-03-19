@@ -11,7 +11,7 @@ import SwiftUI
 struct Shaadhi_com_CloneApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModel: UserViewModel(userService: UserServiceIMPL(url: URL(string: "https://randomuser.me/api/?results=10")!)))
         }
     }
 }
