@@ -29,6 +29,11 @@ struct ContentView: View {
                 .padding(16)
             }
             .navigationTitle("MatchMate")
+            .alert("Error", isPresented: $viewModel.showAlert, actions: {
+                Button("OK", role: .cancel) { }
+            }, message: {
+                Text(viewModel.errorMessage ?? "An unexpected error occurred.")
+            })
         }
         .onAppear(perform: {
             Task {

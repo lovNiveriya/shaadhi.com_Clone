@@ -13,6 +13,7 @@ final class UserViewModel: ObservableObject {
     @Published var users: [User] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var showAlert: Bool = false
 
     private let userService: UserServiceProtocol
     private let networkMonitor: NetworkMonitor
@@ -34,6 +35,7 @@ final class UserViewModel: ObservableObject {
             }
         } catch {
             errorMessage = "Failed to fetch users: \(error.localizedDescription)"
+            showAlert = true
         }
         isLoading = false
     }
