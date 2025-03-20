@@ -20,11 +20,11 @@ struct User: Codable {
     let picture: Picture
     let phone: String
     let cell: String
-    var isSelected: Bool = false
+    var isSelected: Bool? = false
 
     struct ID: Codable, Hashable {
-        let name: String
-        let value: String
+        let name: String?
+        let value: String?
     }
 
     struct Name: Codable {
@@ -53,7 +53,7 @@ struct User: Codable {
 
 extension User {
     static let mockUser = User(
-        id: User.ID(name: "ssd", value: "22-hh-22-jj"), name: User.Name(title: "Mr", first: "John", last: "Doe"),
+        id: User.ID(name: "ssd", value: "djh-dkjs-dnn"), name: User.Name(title: "Mr", first: "John", last: "Doe"),
         location: User.Location(city: "New York", state: "NY", country: "USA"),
         email: "johndoe@example.com",
         dob: User.DOB(date: "1990-01-01", age: 34),

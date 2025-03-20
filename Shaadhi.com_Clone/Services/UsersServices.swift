@@ -62,7 +62,7 @@ final class UserServiceIMPL: UserServiceProtocol {
             let storedUsers = try context.fetch(fetchRequest)
             return storedUsers.map { entity in
                 User(
-                    id: User.ID(name: "", value: entity.id ?? UUID().uuidString), name: User.Name(title: "", first: entity.firstName ?? "", last: entity.lastName ?? ""),
+                    id: User.ID(name: UUID().uuidString, value: entity.id), name: User.Name(title: "", first: entity.firstName ?? "", last: entity.lastName ?? ""),
                     location: User.Location(city: entity.city ?? "", state: "", country: entity.country ?? ""),
                     email: entity.email ?? "",
                     dob: User.DOB(date: "", age: Int(entity.age)),

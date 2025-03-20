@@ -29,7 +29,7 @@ final class UserViewModel: ObservableObject {
         errorMessage = nil
         do {
             if networkMonitor.isConnected {
-                users = try await userService.fetchUsers()
+               users = try await userService.fetchUsers()
             } else {
                 users = userService.fetchUsersFromCoreData()
             }
