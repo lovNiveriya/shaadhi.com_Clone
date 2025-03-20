@@ -53,7 +53,7 @@ extension User {
         picture: User.Picture(
             large: "https://randomuser.me/api/portraits/men/1.jpg",
             medium: "https://randomuser.me/api/portraits/med/men/1.jpg",
-            thumbnail: "https://randomuser.me/api/portraits/thumb/men/1.jpg"
+            thumbnail: "https://picsum.photos/340/600"
         ),
         phone: "(123) 456-7890",
         cell: "(987) 654-3210"

@@ -11,50 +11,90 @@ struct UserCardView: View {
     let user: User
     var acceptAction: () -> Void
     var declineAction: () -> Void
-
-    var body: some View {
-        VStack {
-            WebImage(url: URL(string: user.picture.large))
-                .resizable()
-                .indicator(.activity)
-                .scaledToFill()
-                .frame(height: 300)
-                .clipped()
-                .cornerRadius(10)
     
-            Text("\(user.name.first) \(user.name.last)")
-                .font(.title2)
-                .fontWeight(.bold)
-
-            Text("\(user.location.city), \(user.location.country)")
-                .foregroundColor(.gray)
-
+    private var imageView: some View {
+        WebImage(url: URL(string: user.picture.large))
+            .resizable()
+            .indicator(.activity)
+            .aspectRatio(contentMode: .fit)
+            .overlay(
+                LinearGradient(gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.7)]),
+                               startPoint: .center,
+                               endPoint: .bottom)
+            )
+    }
+    
+    private var userInfo: some View {
+        VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Button(action: acceptAction) {
-                    Text("Accept")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+                Text(user.name.first + " " + user.name.last)
+                    .font(.title3)
+                    .bold()
+                    .foregroundColor(.white)
                 
-                Button(action: declineAction) {
-                    Text("Decline")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
+                Image(systemName: "checkmark.seal.fill") // Verified badge
+                    .foregroundColor(.blue)
             }
-            .padding(.horizontal)
+            
+            Text("\(user.dob.age) yrs • Engineer")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
+            
+            Text("\(user.location.country)")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.8))
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
+        .padding(.horizontal, 10)
+    }
+    
+    private var buttonStackView: some View {
+        HStack {
+            VStack {
+                Button(action: declineAction) {
+                    Circle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width: 60, height: 60)
+                        .overlay(Image(systemName: "xmark").foregroundColor(.white).font(.title2))
+                }
+                Text("Not Now")
+                    .foregroundColor(.white)
+                    .font(.footnote)
+            }
+            
+            Spacer()
+            
+            VStack {
+                Button(action: acceptAction) {
+                    Circle()
+                        .fill(LinearGradient(gradient: Gradient(colors: [Color.green, Color.blue]),
+                                             startPoint: .topLeading,
+                                             endPoint: .bottomTrailing))
+                        .frame(width: 60, height: 60)
+                        .overlay(Image(systemName: "checkmark").foregroundColor(.white).font(.title2))
+                }
+                Text("Connect")
+                    .foregroundColor(.white)
+                    .font(.footnote)
+            }
+        }
+        .padding(.horizontal, 8)
+    }
+    
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            imageView
+                .edgesIgnoringSafeArea(.all)
+            VStack(alignment: .leading, spacing: 16) {
+                userInfo
+                buttonStackView
+            }
+            .padding()
+        }
+        
+        .cornerRadius(16)
         .shadow(radius: 5)
     }
+    
 }
 
 #Preview {

@@ -15,18 +15,26 @@ struct ContentView: View {
     }
 
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(viewModel.users, id: \.cell) { user in
+                        UserCardView(
+                            user: user,
+                            acceptAction: { viewModel.acceptUser(user) },
+                            declineAction: { viewModel.declineUser(user) }
+                        )
+                    }
+                }
+                .padding(16)
+            }
+            .navigationTitle("MatchMate")
         }
         .onAppear(perform: {
             Task {
                 await viewModel.loadUsers()
             }
         })
-        .padding()
     }
 }
 
