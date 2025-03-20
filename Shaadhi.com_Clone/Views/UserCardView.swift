@@ -13,7 +13,7 @@ struct UserCardView: View {
     var declineAction: () -> Void
     
     private var imageView: some View {
-        WebImage(url: URL(string: user.picture.large))
+        WebImage(url: URL(string: user.picture.thumbnail))
             .resizable()
             .indicator(.activity)
             .aspectRatio(contentMode: .fit)

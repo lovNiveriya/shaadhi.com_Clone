@@ -20,6 +20,7 @@ struct User: Codable {
     let picture: Picture
     let phone: String
     let cell: String
+    var isSelected: Bool = false
 
     struct ID: Codable, Hashable {
         let name: String
