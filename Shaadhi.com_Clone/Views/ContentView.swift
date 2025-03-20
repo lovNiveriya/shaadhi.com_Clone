@@ -18,7 +18,7 @@ struct ContentView: View {
         NavigationView {
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    ForEach(viewModel.users, id: \.cell) { user in
+                    ForEach(viewModel.users, id: \.id) { user in
                         UserCardView(
                             user: user,
                             acceptAction: { viewModel.acceptUser(user) },

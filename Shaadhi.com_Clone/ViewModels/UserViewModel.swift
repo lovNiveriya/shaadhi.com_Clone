@@ -5,8 +5,9 @@
 //  Created by LOVE  on 19/03/25.
 //
 
-import Foundation
 import Combine
+import Foundation
+import Network
 
 final class UserViewModel: ObservableObject {
     @Published var users: [User] = []
@@ -14,9 +15,11 @@ final class UserViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private let userService: UserServiceProtocol
+    private let networkMonitor: NetworkMonitor
 
-    init(userService: UserServiceProtocol) {
+    init(userService: UserServiceProtocol, networkMonitor: NetworkMonitor = NetworkMonitor.shared) {
         self.userService = userService
+        self.networkMonitor = networkMonitor
     }
 
     @MainActor
@@ -24,7 +27,11 @@ final class UserViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            users = try await userService.fetchUsers()
+            if networkMonitor.isConnected {
+                users = try await userService.fetchUsers()
+            } else {
+                users = userService.fetchUsersFromCoreData()
+            }
         } catch {
             errorMessage = "Failed to fetch users: \(error.localizedDescription)"
         }

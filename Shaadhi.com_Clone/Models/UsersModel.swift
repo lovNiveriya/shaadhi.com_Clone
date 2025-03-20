@@ -12,6 +12,7 @@ struct UserResponse: Codable {
 }
 
 struct User: Codable {
+    let id: ID
     let name: Name
     let location: Location
     let email: String
@@ -19,7 +20,12 @@ struct User: Codable {
     let picture: Picture
     let phone: String
     let cell: String
-    
+
+    struct ID: Codable, Hashable {
+        let name: String
+        let value: String
+    }
+
     struct Name: Codable {
         let title: String
         let first: String
@@ -46,7 +52,7 @@ struct User: Codable {
 
 extension User {
     static let mockUser = User(
-        name: User.Name(title: "Mr", first: "John", last: "Doe"),
+        id: User.ID(name: "ssd", value: "22-hh-22-jj"), name: User.Name(title: "Mr", first: "John", last: "Doe"),
         location: User.Location(city: "New York", state: "NY", country: "USA"),
         email: "johndoe@example.com",
         dob: User.DOB(date: "1990-01-01", age: 34),
