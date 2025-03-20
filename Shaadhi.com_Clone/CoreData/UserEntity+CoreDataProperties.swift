@@ -11,7 +11,7 @@ import CoreData
 
 
 extension UserEntity {
-
+    
     @nonobjc public class func fetchRequest() -> NSFetchRequest<UserEntity> {
         return NSFetchRequest<UserEntity>(entityName: "UserEntity")
     }
@@ -24,6 +24,12 @@ extension UserEntity {
     @NSManaged public var id: String?
     @NSManaged public var imageUrl: String?
     @NSManaged public var age: Int16
+    @NSManaged private var selectionStateRaw: Int16
+
+    var selectionState: SelectionState {
+        get { SelectionState(rawValue: selectionStateRaw) ?? .none }
+        set { selectionStateRaw = newValue.rawValue }
+    }
 
 }
 

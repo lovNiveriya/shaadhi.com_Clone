@@ -19,11 +19,9 @@ struct ContentView: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(viewModel.users, id: \.id) { user in
-                        UserCardView(
-                            user: user,
-                            acceptAction: { viewModel.acceptUser(user) },
-                            declineAction: { viewModel.declineUser(user) }
-                        )
+                        UserCardView(user: user) { user in
+                            viewModel.handelUserSelectionAction(user, selectionState: user.selectionState)
+                        }
                     }
                 }
                 .padding(16)

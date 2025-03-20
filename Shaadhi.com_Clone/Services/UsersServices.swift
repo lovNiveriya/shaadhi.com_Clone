@@ -67,7 +67,8 @@ final class UserServiceIMPL: UserServiceProtocol {
                     location: User.Location(city: entity.city ?? "", country: entity.country ?? ""),
                     email: entity.email ?? "",
                     dob: User.DOB(age: Int(entity.age)),
-                    picture: User.Picture(large: entity.imageUrl ?? "")
+                    picture: User.Picture(large: entity.imageUrl ?? ""),
+                    selectionState: entity.selectionState
                 )
             }
         } catch {

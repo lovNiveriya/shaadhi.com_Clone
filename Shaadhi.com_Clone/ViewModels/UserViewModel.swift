@@ -15,10 +15,12 @@ final class UserViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var showAlert: Bool = false
 
+    private let coreDataManager: CoreDataManager = CoreDataManager.shared
     private let userService: UserServiceProtocol
     private let networkMonitor: NetworkMonitor
 
-    init(userService: UserServiceProtocol, networkMonitor: NetworkMonitor = NetworkMonitor.shared) {
+    init(userService: UserServiceProtocol,
+         networkMonitor: NetworkMonitor = NetworkMonitor.shared) {
         self.userService = userService
         self.networkMonitor = networkMonitor
     }
@@ -28,11 +30,7 @@ final class UserViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            if networkMonitor.isConnected {
-               users = try await userService.fetchUsers()
-            } else {
-                users = userService.fetchUsersFromCoreData()
-            }
+            users = networkMonitor.isConnected ? try await userService.fetchUsers() : userService.fetchUsersFromCoreData()
         } catch {
             errorMessage = "Failed to fetch users: \(error.localizedDescription)"
             showAlert = true
@@ -40,11 +38,9 @@ final class UserViewModel: ObservableObject {
         isLoading = false
     }
 
-    func acceptUser(_ user: User) {
-        // Will Handle local persistence logic here
+    func handelUserSelectionAction(_ user: User, selectionState: SelectionState?) {
+        guard let id = user.id.value, let selectionState = selectionState else { return }
+        coreDataManager.updateUserSelectionState(userId: id, newState: selectionState)
     }
 
-    func declineUser(_ user: User) {
-        // Will Handle local persistence logic here
-    }
 }

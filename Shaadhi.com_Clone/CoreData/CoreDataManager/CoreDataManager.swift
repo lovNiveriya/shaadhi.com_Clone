@@ -31,4 +31,19 @@ final class CoreDataManager {
             print("Failed to save Core Data: \(error.localizedDescription)")
         }
     }
+
+    func updateUserSelectionState(userId: String, newState: SelectionState) {
+        let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", userId)
+        do {
+            let users = try context.fetch(fetchRequest)
+            if let userEntity = users.first {
+                userEntity.selectionState = newState
+                CoreDataManager.shared.saveContext()
+            }
+        } catch {
+            print("Failed to update selection state for userId \(userId): \(error.localizedDescription)")
+        }
+    }
+
 }

@@ -8,20 +8,19 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct UserCardView: View {
-    let user: User
-    var acceptAction: () -> Void
-    var declineAction: () -> Void
+    @State var user: User
+    var updateUserStatus: (User) -> Void
 
     @State private var offset: CGFloat = 0
     @State private var opacity: Double = 1.0
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
             imageView
                 .edgesIgnoringSafeArea(.all)
             VStack(alignment: .leading, spacing: 16) {
                 userInfo
-                buttonStackView
+                userStatusView
             }
             .padding()
         }
@@ -29,6 +28,7 @@ struct UserCardView: View {
         .shadow(radius: 5)
         .offset(x: offset)
         .opacity(opacity)
+        .animation(.easeInOut(duration: 0.5), value: offset)
     }
 
     private var imageView: some View {
@@ -65,62 +65,76 @@ struct UserCardView: View {
         }
         .padding(.horizontal, 10)
     }
-    
+
+    @ViewBuilder
+    private var userStatusView: some View {
+        if user.selectionState == SelectionState.none || user.selectionState == nil {
+            buttonStackView
+        } else {
+            selectedStateView
+        }
+    }
+
     private var buttonStackView: some View {
         HStack {
-            VStack {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        offset = -300
-                        opacity = 0
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        declineAction()
-                        resetCard()
-                    }
-                }) {
-                    Circle()
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(width: 60, height: 60)
-                        .overlay(Image(systemName: "xmark").foregroundColor(.white).font(.title2))
-                }
-                Text("Not Now")
-                    .foregroundColor(.white)
-                    .font(.footnote)
+            Button(action: {
+                handleSelection(.rejected)
+            }) {
+                Circle()
+                    .fill(Color.gray.opacity(0.2))
+                    .frame(width: 60, height: 60)
+                    .overlay(Image(systemName: "xmark")
+                                .foregroundColor(.white)
+                                .font(.title2))
             }
             
             Spacer()
             
-            VStack {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        offset = 300
-                        opacity = 0
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        acceptAction()
-                        resetCard()
-                    }
-                }) {
-                    Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: [Color.green, Color.blue]),
-                                             startPoint: .topLeading,
-                                             endPoint: .bottomTrailing))
-                        .frame(width: 60, height: 60)
-                        .overlay(Image(systemName: "checkmark").foregroundColor(.white).font(.title2))
-                }
-                Text("Connect")
-                    .foregroundColor(.white)
-                    .font(.footnote)
+            Button(action: {
+                handleSelection(.accepted)
+            }) {
+                Circle()
+                    .fill(LinearGradient(gradient: Gradient(colors: [Color.green, Color.blue]),
+                                         startPoint: .topLeading,
+                                         endPoint: .bottomTrailing))
+                    .frame(width: 60, height: 60)
+                    .overlay(Image(systemName: "checkmark")
+                                .foregroundColor(.white)
+                                .font(.title2))
             }
         }
         .padding(.horizontal, 8)
     }
 
-    private func resetCard() {
-        withAnimation(.easeInOut(duration: 0.3)) {
-            offset = 0
-            opacity = 1.0
+    private var selectedStateView: some View {
+        Text(user.selectionState == .accepted ? "Accepted ✅" : "Rejected ❌")
+            .font(.title2)
+            .fontWeight(.bold)
+            .foregroundColor(user.selectionState == .accepted ? .green : .red)
+            .padding()
+            .background(Color.white.opacity(0.8))
+            .cornerRadius(12)
+            .transition(.scale)
+            .animation(.spring(), value: user.selectionState)
+    }
+
+    private func handleSelection(_ state: SelectionState) {
+        if user.selectionState == state { return }
+        user.selectionState = state
+
+        withAnimation(.easeInOut(duration: 0.5)) {
+            offset = state == .accepted ? 300 : (state == .rejected ? -300 : 0)
+            opacity = 0
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            user.isSelected = (state == .accepted)
+            updateUserStatus(user)
+
+            withAnimation(.easeInOut(duration: 0.3)) {
+                offset = 0
+                opacity = 1.0
+            }
         }
     }
 }
@@ -128,7 +142,8 @@ struct UserCardView: View {
 #Preview {
     UserCardView(
         user: User.mockUser,
-        acceptAction: { print("Accepted") },
-        declineAction: { print("Declined") }
+        updateUserStatus: { updatedUser in
+            print("User status updated: \(updatedUser.isSelected ?? false ? "Accepted" : "Rejected")")
+        }
     )
 }

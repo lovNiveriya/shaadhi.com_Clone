@@ -7,6 +7,12 @@
 
 import Foundation
 
+enum SelectionState: Int16, Codable {
+    case none = 0
+    case accepted = 1
+    case rejected = 2
+}
+
 struct UserResponse: Codable {
     let results: [User]
 }
@@ -19,6 +25,7 @@ struct User: Codable {
     let dob: DOB
     let picture: Picture
     var isSelected: Bool? = false
+    var selectionState: SelectionState? = SelectionState.none
 
     struct ID: Codable, Hashable {
         let name: String?
