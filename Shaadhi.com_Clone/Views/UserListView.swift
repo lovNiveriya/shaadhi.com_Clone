@@ -10,8 +10,12 @@ import SwiftUI
 struct UserListView: View {
     @StateObject var viewModel: UserViewModel
 
-    init(viewModel: UserViewModel) {
-        self._viewModel = StateObject(wrappedValue: UserViewModel(userService: UserServiceIMPL(url: URL(string: Constants.apiURLString)!)))
+    init() {
+        if let url = URL(string: Constants.apiURLString) {
+            _viewModel = StateObject(wrappedValue: UserViewModel(userService: UserServiceIMPL(url: url)))
+        } else {
+            fatalError("Invalid URL string: \(Constants.apiURLString)")
+        }
     }
 
     var body: some View {
@@ -52,5 +56,5 @@ struct Constants {
 }
 
 #Preview {
-    UserListView(viewModel: UserViewModel(userService: UserServiceIMPL(url: URL(string: "https://randomuser.me/api/?results=10")!)))
+    UserListView()
 }

@@ -124,39 +124,40 @@ struct UserCardView: View {
             offset = state == .accepted ? 300 : (state == .rejected ? -300 : 0)
             opacity = 0
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + Constants.animationDuration) {
             updateUserStatus(user)
-
+            
             withAnimation(.easeInOut(duration: 0.3)) {
                 offset = 0
                 opacity = 1.0
             }
         }
     }
+
     private struct Constants {
-            static let cornerRadius: CGFloat = 16
-            static let shadowRadius: CGFloat = 5
-            static let animationDuration: Double = 0.5
-            static let padding: CGFloat = 16
-            static let horizontalPadding: CGFloat = 10
-            static let buttonSize: CGFloat = 60
-            static let buttonIconFontSize: Font = .title2
-            static let buttonSpacing: CGFloat = 8
-            static let acceptedText = "Accepted ✅"
-            static let rejectedText = "Rejected ❌"
-            static let acceptedColor = Color.green
-            static let rejectedColor = Color.red
-            static let overlayGradient = LinearGradient(
-                gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.7)]),
-                startPoint: .center,
-                endPoint: .bottom
-            )
-            static let buttonGradient = LinearGradient(
-                gradient: Gradient(colors: [Color.green, Color.blue]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        static let cornerRadius: CGFloat = 16
+        static let shadowRadius: CGFloat = 5
+        static let animationDuration: Double = 0.5
+        static let padding: CGFloat = 16
+        static let horizontalPadding: CGFloat = 10
+        static let buttonSize: CGFloat = 60
+        static let buttonIconFontSize: Font = .title2
+        static let buttonSpacing: CGFloat = 8
+        static let acceptedText = "Accepted ✅"
+        static let rejectedText = "Rejected ❌"
+        static let acceptedColor = Color.green
+        static let rejectedColor = Color.red
+        static let overlayGradient = LinearGradient(
+            gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.7)]),
+            startPoint: .center,
+            endPoint: .bottom
+        )
+        static let buttonGradient = LinearGradient(
+            gradient: Gradient(colors: [Color.green, Color.blue]),
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
     }
 }
 
