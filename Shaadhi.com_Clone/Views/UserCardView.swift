@@ -9,26 +9,26 @@ import SDWebImageSwiftUI
 
 struct UserCardView: View {
     @State var user: User
-    var updateUserStatus: (User) -> Void
-
     @State private var offset: CGFloat = 0
     @State private var opacity: Double = 1.0
+
+    var updateUserStatus: (User) -> Void
 
     var body: some View {
         ZStack(alignment: .bottom) {
             imageView
                 .edgesIgnoringSafeArea(.all)
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Constants.padding) {
                 userInfo
                 userStatusView
             }
             .padding()
         }
-        .cornerRadius(16)
-        .shadow(radius: 5)
+        .cornerRadius(Constants.cornerRadius)
+        .shadow(radius: Constants.shadowRadius)
         .offset(x: offset)
         .opacity(opacity)
-        .animation(.easeInOut(duration: 0.5), value: offset)
+        .animation(.easeInOut(duration: Constants.animationDuration), value: offset)
     }
 
     private var imageView: some View {
@@ -36,22 +36,18 @@ struct UserCardView: View {
             .resizable()
             .indicator(.activity)
             .aspectRatio(contentMode: .fit)
-            .overlay(
-                LinearGradient(gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.7)]),
-                               startPoint: .center,
-                               endPoint: .bottom)
-            )
+            .overlay(Constants.overlayGradient)
     }
 
     private var userInfo: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(user.name.first + " " + user.name.last)
+                Text("\(user.name.first) \(user.name.last)")
                     .font(.title3)
                     .bold()
                     .foregroundColor(.white)
                 
-                Image(systemName: "checkmark.seal.fill") // Verified badge
+                Image(systemName: "checkmark.seal.fill")
                     .foregroundColor(.blue)
             }
             
@@ -59,11 +55,11 @@ struct UserCardView: View {
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
             
-            Text("\(user.location.country)")
+            Text(user.location.country)
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, Constants.horizontalPadding)
     }
 
     @ViewBuilder
@@ -82,10 +78,12 @@ struct UserCardView: View {
             }) {
                 Circle()
                     .fill(Color.gray.opacity(0.2))
-                    .frame(width: 60, height: 60)
-                    .overlay(Image(systemName: "xmark")
-                                .foregroundColor(.white)
-                                .font(.title2))
+                    .frame(width: Constants.buttonSize, height: Constants.buttonSize)
+                    .overlay(
+                        Image(systemName: "xmark")
+                            .foregroundColor(.white)
+                            .font(Constants.buttonIconFontSize)
+                    )
             }
             
             Spacer()
@@ -94,23 +92,23 @@ struct UserCardView: View {
                 handleSelection(.accepted)
             }) {
                 Circle()
-                    .fill(LinearGradient(gradient: Gradient(colors: [Color.green, Color.blue]),
-                                         startPoint: .topLeading,
-                                         endPoint: .bottomTrailing))
-                    .frame(width: 60, height: 60)
-                    .overlay(Image(systemName: "checkmark")
-                                .foregroundColor(.white)
-                                .font(.title2))
+                    .fill(Constants.buttonGradient)
+                    .frame(width: Constants.buttonSize, height: Constants.buttonSize)
+                    .overlay(
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.white)
+                            .font(Constants.buttonIconFontSize)
+                    )
             }
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, Constants.buttonSpacing)
     }
 
     private var selectedStateView: some View {
-        Text(user.selectionState == .accepted ? "Accepted ✅" : "Rejected ❌")
+        Text(user.selectionState == .accepted ? Constants.acceptedText : Constants.rejectedText)
             .font(.title2)
             .fontWeight(.bold)
-            .foregroundColor(user.selectionState == .accepted ? .green : .red)
+            .foregroundColor(user.selectionState == .accepted ? Constants.acceptedColor : Constants.rejectedColor)
             .padding()
             .background(Color.white.opacity(0.8))
             .cornerRadius(12)
@@ -122,13 +120,12 @@ struct UserCardView: View {
         if user.selectionState == state { return }
         user.selectionState = state
 
-        withAnimation(.easeInOut(duration: 0.5)) {
+        withAnimation(.easeInOut(duration: Constants.animationDuration)) {
             offset = state == .accepted ? 300 : (state == .rejected ? -300 : 0)
             opacity = 0
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            user.isSelected = (state == .accepted)
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.animationDuration) {
             updateUserStatus(user)
 
             withAnimation(.easeInOut(duration: 0.3)) {
@@ -137,13 +134,35 @@ struct UserCardView: View {
             }
         }
     }
+    private struct Constants {
+            static let cornerRadius: CGFloat = 16
+            static let shadowRadius: CGFloat = 5
+            static let animationDuration: Double = 0.5
+            static let padding: CGFloat = 16
+            static let horizontalPadding: CGFloat = 10
+            static let buttonSize: CGFloat = 60
+            static let buttonIconFontSize: Font = .title2
+            static let buttonSpacing: CGFloat = 8
+            static let acceptedText = "Accepted ✅"
+            static let rejectedText = "Rejected ❌"
+            static let acceptedColor = Color.green
+            static let rejectedColor = Color.red
+            static let overlayGradient = LinearGradient(
+                gradient: Gradient(colors: [Color.clear, Color.black.opacity(0.7)]),
+                startPoint: .center,
+                endPoint: .bottom
+            )
+            static let buttonGradient = LinearGradient(
+                gradient: Gradient(colors: [Color.green, Color.blue]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+    }
 }
 
 #Preview {
     UserCardView(
         user: User.mockUser,
-        updateUserStatus: { updatedUser in
-            print("User status updated: \(updatedUser.isSelected ?? false ? "Accepted" : "Rejected")")
-        }
+        updateUserStatus: { updatedUser in }
     )
 }

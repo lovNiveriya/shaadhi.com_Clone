@@ -11,34 +11,44 @@ struct UserListView: View {
     @StateObject var viewModel: UserViewModel
 
     init(viewModel: UserViewModel) {
-        self._viewModel = StateObject(wrappedValue: UserViewModel(userService: UserServiceIMPL(url: URL(string: "https://randomuser.me/api/?results=10")!)))
+        self._viewModel = StateObject(wrappedValue: UserViewModel(userService: UserServiceIMPL(url: URL(string: Constants.apiURLString)!)))
     }
 
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 16) {
+                LazyVStack(spacing: Constants.cardSpacing) {
                     ForEach(viewModel.users, id: \.id) { user in
                         UserCardView(user: user) { user in
                             viewModel.handelUserSelectionAction(user, selectionState: user.selectionState)
                         }
                     }
                 }
-                .padding(16)
+                .padding(Constants.padding)
             }
-            .navigationTitle("MatchMate")
-            .alert("Error", isPresented: $viewModel.showAlert, actions: {
-                Button("OK", role: .cancel) { }
+            .navigationTitle(Constants.navigationTitle)
+            .alert(Constants.alertTitle, isPresented: $viewModel.showAlert, actions: {
+                Button(Constants.alertButtonTitle, role: .cancel) { }
             }, message: {
-                Text(viewModel.errorMessage ?? "An unexpected error occurred.")
+                Text(viewModel.errorMessage ?? Constants.alertDefaultMessage)
             })
         }
-        .onAppear(perform: {
+        .onAppear {
             Task {
                 await viewModel.loadUsers()
             }
-        })
+        }
     }
+}
+
+struct Constants {
+    static let apiURLString = "https://randomuser.me/api/?results=10"
+    static let navigationTitle = "MatchMate"
+    static let padding: CGFloat = 16.0
+    static let cardSpacing: CGFloat = 16.0
+    static let alertTitle = "Error"
+    static let alertButtonTitle = "OK"
+    static let alertDefaultMessage = "An unexpected error occurred."
 }
 
 #Preview {

@@ -24,7 +24,6 @@ struct User: Codable {
     let email: String
     let dob: DOB
     let picture: Picture
-    var isSelected: Bool? = false
     var selectionState: SelectionState? = SelectionState.none
 
     struct ID: Codable, Hashable {
