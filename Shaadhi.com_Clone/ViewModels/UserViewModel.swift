@@ -32,15 +32,23 @@ final class UserViewModel: ObservableObject {
         do {
             users = networkMonitor.isConnected ? try await userService.fetchUsers() : try userService.fetchUsersFromCoreData()
         } catch {
-            errorMessage = "Failed to fetch users: \(error.localizedDescription)"
-            showAlert = true
+            handelError(error: error.localizedDescription)
         }
         isLoading = false
     }
 
     func handelUserSelectionAction(_ user: User, selectionState: SelectionState?) {
         guard let id = user.id.value, let selectionState = selectionState else { return }
-        coreDataManager.updateUserSelectionState(userId: id, newState: selectionState)
+        do {
+            try coreDataManager.updateUserSelectionState(userId: id, newState: selectionState)
+        } catch {
+            handelError(error: error.localizedDescription)
+        }
+    }
+
+    private func handelError(error: String) {
+        errorMessage = "Failed to fetch users: \(error)"
+        showAlert = true
     }
 
 }

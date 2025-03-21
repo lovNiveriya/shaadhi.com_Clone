@@ -20,7 +20,7 @@ final class NetworkServiceIMPL: NetworkServiceProtocol {
 
     func fetchData<T: Decodable>(from url: URL) async throws -> T {
         let (data, response) = try await session.data(from: url)
-        
+
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
             throw URLError(.badServerResponse)
         }

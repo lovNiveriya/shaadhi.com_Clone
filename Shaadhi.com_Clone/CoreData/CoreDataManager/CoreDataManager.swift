@@ -24,25 +24,25 @@ final class CoreDataManager {
         return persistentContainer.viewContext
     }
 
-    func saveContext() {
+    func saveContext() throws {
         do {
             try context.save()
         } catch {
-            print("Failed to save Core Data: \(error.localizedDescription)")
+            throw error
         }
     }
 
-    func updateUserSelectionState(userId: String, newState: SelectionState) {
+    func updateUserSelectionState(userId: String, newState: SelectionState) throws  {
         let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "id == %@", userId)
         do {
             let users = try context.fetch(fetchRequest)
             if let userEntity = users.first {
                 userEntity.selectionState = newState
-                CoreDataManager.shared.saveContext()
+                try CoreDataManager.shared.saveContext()
             }
         } catch {
-            print("Failed to update selection state for userId \(userId): \(error.localizedDescription)")
+            throw error
         }
     }
 
