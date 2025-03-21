@@ -10,7 +10,7 @@ import CoreData
 
 protocol UserServiceProtocol {
     func fetchUsers() async throws -> [User]
-    func fetchUsersFromCoreData() -> [User]
+    func fetchUsersFromCoreData() throws -> [User]
 }
 
 final class UserServiceIMPL: UserServiceProtocol {
@@ -27,36 +27,38 @@ final class UserServiceIMPL: UserServiceProtocol {
         do {
             let response: UserResponse = try await networkService.fetchData(from: url)
             let users = response.results
-
-            saveUsersToCoreData(users)
+            try saveUsersToCoreData(users)
             return users
         } catch {
-            print("Fetching from API failed, loading from Core Data.")
-            return fetchUsersFromCoreData()
+            throw error
         }
     }
 
-    private func saveUsersToCoreData(_ users: [User]) {
-        context.perform {
-            self.clearUsersFromCoreData()
+    private func saveUsersToCoreData(_ users: [User]) throws {
+        try context.performAndWait {
+            do {
+                try self.clearUsersFromCoreData()
 
-            for user in users {
-                let entity = UserEntity(context: self.context)
-                entity.id = user.id.value
-                entity.firstName = user.name.first
-                entity.lastName = user.name.last
-                entity.email = user.email
-                entity.city = user.location.city
-                entity.country = user.location.country
-                entity.age = Int16(user.dob.age)
-                entity.imageUrl = user.picture.large
+                for user in users {
+                    let entity = UserEntity(context: self.context)
+                    entity.id = user.id.value
+                    entity.firstName = user.name.first
+                    entity.lastName = user.name.last
+                    entity.email = user.email
+                    entity.city = user.location.city
+                    entity.country = user.location.country
+                    entity.age = Int16(user.dob.age)
+                    entity.imageUrl = user.picture.large
+                }
+
+                try self.context.save()
+            } catch {
+                throw error
             }
-
-            CoreDataManager.shared.saveContext()
         }
     }
 
-    func fetchUsersFromCoreData() -> [User] {
+    func fetchUsersFromCoreData() throws -> [User] {
         let fetchRequest: NSFetchRequest<UserEntity> = UserEntity.fetchRequest()
         do {
             let storedUsers = try context.fetch(fetchRequest)
@@ -72,12 +74,11 @@ final class UserServiceIMPL: UserServiceProtocol {
                 )
             }
         } catch {
-            print("Failed to fetch users from Core Data: \(error.localizedDescription)")
-            return []
+            throw error
         }
     }
 
-    private func clearUsersFromCoreData() {
+    private func clearUsersFromCoreData() throws {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = UserEntity.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
@@ -85,7 +86,7 @@ final class UserServiceIMPL: UserServiceProtocol {
             try context.execute(deleteRequest)
             try context.save()
         } catch {
-            print("Failed to clear Core Data: \(error.localizedDescription)")
+            throw error
         }
     }
 }

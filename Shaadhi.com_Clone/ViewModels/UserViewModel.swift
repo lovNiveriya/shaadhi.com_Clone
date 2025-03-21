@@ -30,7 +30,7 @@ final class UserViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            users = networkMonitor.isConnected ? try await userService.fetchUsers() : userService.fetchUsersFromCoreData()
+            users = networkMonitor.isConnected ? try await userService.fetchUsers() : try userService.fetchUsersFromCoreData()
         } catch {
             errorMessage = "Failed to fetch users: \(error.localizedDescription)"
             showAlert = true
